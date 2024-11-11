@@ -1,0 +1,6 @@
+---
+# handlers file for rt_kernel
+- name: Reboot System
+  ansible.builtin.reboot:
+      reboot_timeout: 300
+  become: true

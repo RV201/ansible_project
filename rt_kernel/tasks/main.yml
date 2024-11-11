@@ -1,0 +1,44 @@
+---
+- name: Ensure real-time kernel is installed
+  ansible.builtin.package:
+      name: linux-image-rt-amd64
+      state: present
+  become: true
+- name: Isolate specific CPUs
+  ansible.builtin.shell: |
+      echo "isolcpus=2,3" >> /etc/default/grub
+      update-grub
+  become: true
+  notify: Reboot System
+- name: Install tuned-adm
+  ansible.builtin.package:
+      name: tuned
+      state: present
+  become: true
+- name: Set tuned-adm profile to realtime
+  ansible.builtin.shell: |
+      tuned-adm profile realtime
+  become: true
+- name: Update apt cache
+  ansible.builtin.apt:
+      update_cache: yes
+  become: true
+- name: install linuxptp
+  ansible.builtin.package:
+      name: linuxptp
+      state: present
+  become: true
+- name: Configure ptp4l 
+  ansible.builtin.copy:
+      dest: /etc/linuxptp/ptp4l.conf
+      content: |
+        [global]
+        boundary_clock_jbod 1
+  become: true
+- name: Enable and Start phc2sys service
+  ansible.builtin.copy:
+      dest: /etc/linuxptp/phc2sys.conf
+      content: |
+        -s CLOCK_REALTIME -c eth0
+  become: true
+      
