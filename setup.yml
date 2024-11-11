@@ -1,0 +1,5 @@
+---
+- name: Configure system with real-time kernel and time-sensitive settings
+  hosts: all
+  roles:
+   - rt_kernel
